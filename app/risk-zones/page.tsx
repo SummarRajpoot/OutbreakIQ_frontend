@@ -287,7 +287,7 @@ function AddZoneModal({ onClose, onSuccess }: any) {
                 <Input 
                   type="number"
                   value={formData.activeCases as any}
-                  onChange={e => setFormData({...formData, activeCases: e.target.value === '' ? '' : Number(e.target.value) || 0})}
+                  onChange={e => setFormData({...formData, activeCases: e.target.value === '' ? undefined : Number(e.target.value) || 0})}
                   required
                 />
               </div>
@@ -296,7 +296,7 @@ function AddZoneModal({ onClose, onSuccess }: any) {
                 <Input 
                   type="number"
                   value={formData.patients}
-                  onChange={e => setFormData({...formData, patients: e.target.value === '' ? '' : Number(e.target.value) || 0})}
+                  onChange={e => setFormData({...formData, patients: e.target.value === '' ? undefined : Number(e.target.value) || 0})}
                   required
                 />
               </div>
@@ -313,7 +313,7 @@ function AddZoneModal({ onClose, onSuccess }: any) {
                 <Input 
                   type="number"
                   value={formData.populationDensity as any}
-                  onChange={e => setFormData({...formData, populationDensity: e.target.value === '' ? '' : Number(e.target.value) || 0})}
+                  onChange={e => setFormData({...formData, populationDensity: e.target.value === '' ? undefined : Number(e.target.value) || 0})}
                 />
               </div>
               <div className="space-y-2">
@@ -321,7 +321,7 @@ function AddZoneModal({ onClose, onSuccess }: any) {
                 <Input 
                   type="number"
                   value={formData.hospitalCapacity as any}
-                  onChange={e => setFormData({...formData, hospitalCapacity: e.target.value === '' ? '' : Number(e.target.value) || 0})}
+                  onChange={e => setFormData({...formData, hospitalCapacity: e.target.value === '' ? undefined : Number(e.target.value) || 0})}
                 />
               </div>
             </div>
