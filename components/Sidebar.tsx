@@ -12,6 +12,7 @@ import {
   Settings, 
   LogOut 
 } from 'lucide-react';
+import { signOut } from "next-auth/react";
 import { cn } from '@/lib/utils';
 
 const navItems = [
@@ -95,7 +96,10 @@ export default function Sidebar() {
           </p>
         </motion.div>
 
-        <button className="flex items-center gap-3 px-4 py-3 w-full rounded-xl text-[0.9rem] font-bold text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition-all duration-300 group">
+        <button 
+          onClick={() => signOut({callbackUrl: '/login'})}
+          className="flex items-center gap-3 px-4 py-3 w-full rounded-xl text-[0.9rem] font-bold text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition-all duration-300 group"
+        >
           <LogOut className="w-5 h-5 group-hover:rotate-12 transition-transform" />
           Sign Out
         </button>
