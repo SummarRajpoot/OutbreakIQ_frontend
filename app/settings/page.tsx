@@ -259,7 +259,7 @@ export default function SettingsPage() {
       ]);
       
       const csvContent = [headers, ...rows]
-        .map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(","))
+        .map((row: any[]) => row.map((cell: any) => `"${String(cell).replace(/"/g, '""')}"`).join(","))
         .join("\n");
 
       const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
