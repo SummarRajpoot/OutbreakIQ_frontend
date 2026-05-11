@@ -2,9 +2,11 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Sidebar from "@/components/Sidebar";
+import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SessionProviderWrapper from "@/components/SessionProviderWrapper";
 import { auth } from "@/auth";
+import { cn } from "@/lib/utils";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -26,18 +28,23 @@ export default async function RootLayout({
       <body className={`${inter.className} min-h-screen bg-[#f8fafa]`}>
         <SessionProviderWrapper>
           <div className="flex min-h-screen">
+            {/* Always render sidebar if logged in, or if on specific routes? 
+                The user wants it for the dashboard. */}
             {isLoggedIn && <Sidebar />}
-            <main className={cn("flex-1 flex flex-col", isLoggedIn && "ml-[220px]")}>
-              <div className="flex-1">
+            
+            <div className={cn(
+              "flex-1 flex flex-col min-w-0",
+              isLoggedIn && "ml-[220px]"
+            )}>
+              <Navbar />
+              <main className="flex-1">
                 {children}
-              </div>
+              </main>
               <Footer />
-            </main>
+            </div>
           </div>
         </SessionProviderWrapper>
       </body>
     </html>
   );
 }
-
-import { cn } from "@/lib/utils";
