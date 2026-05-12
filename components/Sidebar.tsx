@@ -10,21 +10,42 @@ import {
   Map, 
   BarChart3, 
   Settings, 
-  LogOut 
+  LogOut,
+  Hospital,
+  Bell
 } from 'lucide-react';
 import { signOut } from "next-auth/react";
 import { cn } from '@/lib/utils';
+import { useState, useEffect } from 'react';
 
 const navItems = [
   { name: 'Overview', path: '/', icon: LayoutDashboard },
   { name: 'Dashboard', path: '/dashboard', icon: BarChart3 },
   { name: 'Risk Zones', path: '/risk-zones', icon: Map },
   { name: 'Statistics', path: '/stats', icon: Activity },
+  { name: 'Hospitals', path: '/hospitals', icon: Hospital },
+  { name: 'Alerts', path: '/alerts', icon: Bell },
   { name: 'Settings', path: '/settings', icon: Settings },
 ];
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const [hasCritical, setHasCritical] = useState(false);
+
+  useEffect(() => {
+    const checkAlerts = async () => {
+      try {
+        const res = await fetch('http://127.0.0.1:8000/api/alerts/summary');
+        const data = await res.json();
+        setHasCritical(data.counts.critical > 0);
+      } catch (err) {
+        console.error("Sidebar alerts check failed", err);
+      }
+    };
+    checkAlerts();
+    const interval = setInterval(checkAlerts, 60000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <aside className="fixed left-0 top-0 h-screen w-[220px] bg-white border-r border-slate-100 flex flex-col z-50">
@@ -70,6 +91,9 @@ export default function Sidebar() {
                   isActive ? "text-white" : "text-slate-400 group-hover:text-[#0d9488]"
                 )} />
                 {item.name}
+                {item.name === 'Alerts' && hasCritical && (
+                  <span className="ml-auto w-2 h-2 bg-rose-500 rounded-full shadow-[0_0_8px_rgba(244,63,94,0.6)] animate-pulse" />
+                )}
               </Link>
             </motion.div>
           );

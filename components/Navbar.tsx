@@ -1,13 +1,39 @@
 'use client';
 
 import { useSession, signIn, signOut } from "next-auth/react";
-import { User, LogIn, Bell, Search, Settings } from 'lucide-react';
+import { User, LogIn, Bell, Search, Settings, AlertCircle, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import Link from 'next/link';
+import { useState, useEffect } from 'react';
 
 export default function Navbar() {
   const { data: session, status } = useSession();
   const isLoggedIn = status === "authenticated";
+  
+  const [summary, setSummary] = useState<any>(null);
+  const [topAlerts, setTopAlerts] = useState<any[]>([]);
+  const [showDropdown, setShowDropdown] = useState(false);
+
+  useEffect(() => {
+    const fetchAlerts = async () => {
+      try {
+        const [sumRes, alertsRes] = await Promise.all([
+          fetch('http://127.0.0.1:8000/api/alerts/summary'),
+          fetch('http://127.0.0.1:8000/api/alerts/')
+        ]);
+        const sumData = await sumRes.json();
+        const alertsData = await alertsRes.json();
+        setSummary(sumData);
+        setTopAlerts(alertsData.slice(0, 5));
+      } catch (err) {
+        console.error("Failed to fetch nav alerts", err);
+      }
+    };
+    fetchAlerts();
+    const interval = setInterval(fetchAlerts, 60000); // Check every minute
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <header className="h-20 bg-white/80 backdrop-blur-md border-b border-slate-100 flex items-center justify-between px-8 sticky top-0 z-40">
@@ -25,10 +51,58 @@ export default function Navbar() {
 
       <div className="flex items-center gap-6">
         {/* Notifications */}
-        <button className="relative p-2 text-slate-400 hover:text-[#0d9488] transition-colors">
-          <Bell className="w-5 h-5" />
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 rounded-full border-2 border-white" />
-        </button>
+        <div className="relative">
+          <button 
+            onClick={() => setShowDropdown(!showDropdown)}
+            className="relative p-2 text-slate-400 hover:text-[#0d9488] transition-colors"
+          >
+            <Bell className="w-5 h-5" />
+            {summary?.total_active_alerts > 0 && (
+              <span className="absolute top-1 right-1 flex h-4 w-4">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-4 w-4 bg-rose-500 border-2 border-white text-[8px] font-bold text-white items-center justify-center">
+                  {summary.total_active_alerts}
+                </span>
+              </span>
+            )}
+          </button>
+
+          <AnimatePresence>
+            {showDropdown && (
+              <motion.div 
+                initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                className="absolute right-0 mt-3 w-[320px] bg-white border border-slate-100 rounded-2xl shadow-2xl shadow-slate-200/50 overflow-hidden"
+              >
+                <div className="p-4 border-b border-slate-50 flex items-center justify-between">
+                  <h4 className="font-bold text-slate-900">Recent Alerts</h4>
+                  <Link href="/alerts" onClick={() => setShowDropdown(false)} className="text-[10px] font-black text-[#0d9488] uppercase tracking-wider hover:underline">View All</Link>
+                </div>
+                <div className="max-h-[350px] overflow-y-auto">
+                  {topAlerts.length > 0 ? topAlerts.map((alert) => (
+                    <div key={alert.id} className="p-4 border-b border-slate-50 hover:bg-slate-50 transition-colors">
+                      <div className="flex items-start gap-3">
+                        <div className={`mt-1 p-1.5 rounded-lg ${alert.severity === 'critical' ? 'bg-red-50 text-red-500' : 'bg-orange-50 text-orange-500'}`}>
+                          <AlertCircle className="w-3.5 h-3.5" />
+                        </div>
+                        <div>
+                          <p className="text-xs font-bold text-slate-900 leading-tight mb-1">{alert.message}</p>
+                          <div className="flex items-center gap-2 text-[10px] text-slate-400">
+                             <MapPin className="w-3 h-3" />
+                             {alert.city} • Just now
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )) : (
+                    <div className="p-8 text-center text-slate-400 text-xs italic">No active alerts.</div>
+                  )}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
 
         {/* User Profile */}
         <div className="flex items-center gap-4 pl-6 border-l border-slate-100">

@@ -5,6 +5,7 @@ import Sidebar from "@/components/Sidebar";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SessionProviderWrapper from "@/components/SessionProviderWrapper";
+import ChatBot from "@/components/ChatBot";
 import { auth } from "@/auth";
 import { cn } from "@/lib/utils";
 
@@ -43,6 +44,7 @@ export default async function RootLayout({
               <Footer />
             </div>
           </div>
+          <ChatBot />
         </SessionProviderWrapper>
       </body>
     </html>
