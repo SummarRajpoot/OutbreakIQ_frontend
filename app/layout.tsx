@@ -12,8 +12,8 @@ import { cn } from "@/lib/utils";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "OutbreakIQ",
-  description: "Intelligent Epidemiological Surveillance Platform",
+  title: "EpiSphere — Global Health Intelligence",
+  description: "A global disease intelligence platform powered by data and AI. Detect. Understand. Protect.",
 };
 
 export default async function RootLayout({
@@ -26,19 +26,18 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
-      <body className={`${inter.className} min-h-screen bg-[#f8fafa]`}>
+      <body className={`${inter.className} min-h-screen bg-[#F8FAFC] text-[#0F172A]`}>
         <SessionProviderWrapper>
           <div className="flex min-h-screen">
-            {/* Always render sidebar if logged in, or if on specific routes? 
-                The user wants it for the dashboard. */}
+            {/* Render sidebar when logged in */}
             {isLoggedIn && <Sidebar />}
             
             <div className={cn(
-              "flex-1 flex flex-col min-w-0",
-              isLoggedIn && "ml-[220px]"
+              "flex-1 flex flex-col min-w-0 transition-[margin] duration-200",
+              isLoggedIn ? "md:ml-[240px] ml-0" : "ml-0"
             )}>
               <Navbar />
-              <main className="flex-1">
+              <main className="flex-1 w-full">
                 {children}
               </main>
               <Footer />
