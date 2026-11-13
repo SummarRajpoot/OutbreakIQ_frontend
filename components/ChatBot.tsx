@@ -12,6 +12,7 @@ import {
   ShieldCheck,
   Minimize2
 } from 'lucide-react';
+import { sendChatMessage } from '@/lib/api';
 
 interface Message {
   id: string;
@@ -57,15 +58,7 @@ export default function ChatBot() {
     setIsLoading(true);
 
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/chatbot/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: input })
-      });
-
-      if (!response.ok) throw new Error('Chatbot failed');
-
-      const data = await response.json();
+      const data = await sendChatMessage(input);
       
       const botMsg: Message = {
         id: (Date.now() + 1).toString(),

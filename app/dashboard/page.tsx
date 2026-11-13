@@ -46,7 +46,7 @@ export default function DashboardPage() {
       setData(res);
     } catch (err) {
       console.error(err);
-      setError('Connection refused. Please ensure the backend is running on localhost:8000.');
+      setError('Unable to connect to the OutbreakIQ backend. Please check your connection.');
     } finally {
       setLoading(false);
     }

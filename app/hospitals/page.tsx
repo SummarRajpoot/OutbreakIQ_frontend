@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
+import { fetchHospitalCities, fetchHospitalDiseases, fetchHospitals } from '@/lib/api';
 
 // Dynamic import for map component to avoid SSR issues
 const MapComponent = dynamic(() => import('./MapComponent'), { 
@@ -20,8 +21,8 @@ interface Hospital {
   type: string;
   diseases: string[];
   emergency: boolean;
-  beds: number;
-  rating: number;
+  beds: number | null;
+  rating: number | null;
   can_treat?: boolean;
 }
 
@@ -41,12 +42,12 @@ export default function HospitalFinderPage() {
     // Fetch filter data
     const fetchFilters = async () => {
       try {
-        const [citiesRes, diseasesRes] = await Promise.all([
-          fetch('http://127.0.0.1:8000/api/hospitals/cities'),
-          fetch('http://127.0.0.1:8000/api/hospitals/diseases')
+        const [citiesData, diseasesData] = await Promise.all([
+          fetchHospitalCities(),
+          fetchHospitalDiseases(),
         ]);
-        setCities(await citiesRes.json());
-        setDiseases(await diseasesRes.json());
+        setCities(citiesData);
+        setDiseases(diseasesData);
       } catch (err) {
         console.error("Failed to fetch filters", err);
       }
@@ -55,21 +56,18 @@ export default function HospitalFinderPage() {
   }, []);
 
   useEffect(() => {
-    // Fetch hospitals based on filters
-    const fetchHospitals = async () => {
+    const loadHospitals = async () => {
       setLoading(true);
       try {
-        const query = new URLSearchParams();
-        if (selectedCity) query.append('city', selectedCity);
-        if (selectedDisease) query.append('disease', selectedDisease);
-        
-        const res = await fetch(`http://127.0.0.1:8000/api/hospitals/?${query.toString()}`);
-        const data = await res.json();
-        setHospitals(data);
+        const data = await fetchHospitals({
+          city: selectedCity || undefined,
+          disease: selectedDisease || undefined,
+        }) as Hospital[];
+        const list = Array.isArray(data) ? data : [];
+        setHospitals(list);
 
-        // If a specific city is selected, center the map on the first hospital of that city
-        if (selectedCity && data.length > 0) {
-          setMapCenter([data[0].lat, data[0].lng]);
+        if (selectedCity && list.length > 0) {
+          setMapCenter([list[0].lat, list[0].lng]);
           setMapZoom(12);
         } else if (!selectedCity) {
           setMapCenter([30.3753, 69.3451]);
@@ -81,7 +79,7 @@ export default function HospitalFinderPage() {
         setLoading(false);
       }
     };
-    fetchHospitals();
+    loadHospitals();
   }, [selectedCity, selectedDisease]);
 
   return (
@@ -156,8 +154,12 @@ export default function HospitalFinderPage() {
                   <div className="flex justify-between items-start mb-4">
                     <h3 className="text-xl font-bold text-slate-100 group-hover:text-teal-400 transition-colors">{hospital.name}</h3>
                     <div className="flex flex-col items-end gap-1">
-                      <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase tracking-tight ${hospital.can_treat ? 'bg-teal-500/10 text-teal-400 border border-teal-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'}`}>
-                        {hospital.can_treat ? 'Can Treat ✅' : 'Not Equipped ❌'}
+                      <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase tracking-tight ${
+                        selectedDisease
+                          ? (hospital.can_treat ? 'bg-teal-500/10 text-teal-400 border border-teal-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20')
+                          : 'bg-slate-700/50 text-slate-400 border border-slate-600/30'
+                      }`}>
+                        {selectedDisease ? (hospital.can_treat ? 'Can Treat' : 'Not Equipped') : 'OSM listing'}
                       </span>
                       <span className="bg-slate-700/50 text-slate-400 px-2 py-1 rounded text-[10px] font-medium border border-slate-600/30">
                         {hospital.type}
@@ -174,20 +176,22 @@ export default function HospitalFinderPage() {
                     </p>
                     <div className="flex items-center gap-4 pt-2">
                       <p className="text-slate-300">
-                        <strong className="text-slate-500 mr-1">Beds:</strong> {hospital.beds}
+                        <strong className="text-slate-500 mr-1">Beds:</strong> {hospital.beds ?? 'N/A'}
                       </p>
                       <p className="text-slate-300">
-                        <strong className="text-slate-500 mr-1">Rating:</strong> {'⭐'.repeat(hospital.rating)}
+                        <strong className="text-slate-500 mr-1">Rating:</strong> {hospital.rating ? '⭐'.repeat(hospital.rating) : 'N/A'}
                       </p>
                     </div>
                   </div>
 
                   <div className="flex flex-wrap gap-1.5">
-                    {hospital.diseases.map(d => (
+                    {hospital.diseases.length > 0 ? hospital.diseases.map(d => (
                       <span key={d} className="bg-slate-700/30 text-slate-400 text-[10px] px-2 py-0.5 rounded border border-slate-600/20">
                         {d}
                       </span>
-                    ))}
+                    )) : (
+                      <span className="text-slate-500 text-[10px]">No specialty tags in OSM</span>
+                    )}
                   </div>
                 </div>
               ))

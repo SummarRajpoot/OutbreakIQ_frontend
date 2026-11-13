@@ -88,6 +88,10 @@ export default function LoginPage() {
   };
 
   const handleOAuthSignIn = (provider: string) => {
+    if (provider === 'linkedin' && !process.env.NEXT_PUBLIC_LINKEDIN_ENABLED) {
+      setError("LinkedIn login is not configured. Use Google, GitHub, or email.");
+      return;
+    }
     setLoading(true);
     signIn(provider, { callbackUrl: '/dashboard' });
   };

@@ -18,7 +18,7 @@ export default function Footer() {
 
         {/* Center — Stack info */}
         <div className="flex items-center gap-6 text-xs text-slate-400">
-          <span>Next.js 14 + Flask</span>
+          <span>Next.js + FastAPI</span>
           <span>•</span>
           <span className="flex items-center gap-1">
             <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-green-400" />

@@ -5,6 +5,7 @@ import { User, LogIn, Bell, Search, Settings, AlertCircle, MapPin } from 'lucide
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
+import { fetchAlerts, fetchAlertsSummary } from '@/lib/api';
 import { useState, useEffect } from 'react';
 
 export default function Navbar() {
@@ -16,22 +17,20 @@ export default function Navbar() {
   const [showDropdown, setShowDropdown] = useState(false);
 
   useEffect(() => {
-    const fetchAlerts = async () => {
+    const loadNavAlerts = async () => {
       try {
-        const [sumRes, alertsRes] = await Promise.all([
-          fetch('http://127.0.0.1:8000/api/alerts/summary'),
-          fetch('http://127.0.0.1:8000/api/alerts/')
+        const [sumData, alertsData] = await Promise.all([
+          fetchAlertsSummary(),
+          fetchAlerts(),
         ]);
-        const sumData = await sumRes.json();
-        const alertsData = await alertsRes.json();
         setSummary(sumData);
-        setTopAlerts(alertsData.slice(0, 5));
+        setTopAlerts(Array.isArray(alertsData) ? alertsData.slice(0, 5) : []);
       } catch (err) {
         console.error("Failed to fetch nav alerts", err);
       }
     };
-    fetchAlerts();
-    const interval = setInterval(fetchAlerts, 60000); // Check every minute
+    loadNavAlerts();
+    const interval = setInterval(loadNavAlerts, 60000);
     return () => clearInterval(interval);
   }, []);
 

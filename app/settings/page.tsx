@@ -30,7 +30,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { fetchDashboardData } from '@/lib/api';
+import { API_BASE_URL, fetchDashboardData } from '@/lib/api';
 import { cn } from '@/lib/utils';
 
 // ── Reusable Toggle Component ────────────────────────────────────────────────
@@ -96,10 +96,6 @@ function Dropdown({ label, options, value, onChange }: { label: string; options:
     </div>
   );
 }
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL 
-  ? `${process.env.NEXT_PUBLIC_API_URL}/api`
-  : 'http://127.0.0.1:7860/api';
 
 export default function SettingsPage() {
   const { data: session } = useSession();

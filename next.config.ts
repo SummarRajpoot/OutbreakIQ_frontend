@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: '/api/((?!auth).*)',
-        destination: `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/:1`,
+        destination: `${process.env.NEXT_PUBLIC_API_URL || 'https://ranasummar0-outbreakiq.hf.space'}/api/:1`,
       },
     ]
   },

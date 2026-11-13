@@ -13,42 +13,21 @@ import {
   Check,
   Activity
 } from 'lucide-react';
-
-interface Alert {
-  id: number;
-  city: string;
-  severity: 'critical' | 'warning' | 'watch' | 'normal';
-  color: string;
-  message: string;
-  active_cases: int;
-  timestamp: string;
-  acknowledged: boolean;
-}
-
-interface Summary {
-  counts: {
-    critical: number;
-    warning: number;
-    watch: number;
-    normal: number;
-  };
-  highest_severity: string;
-  total_active_alerts: number;
-}
+import { acknowledgeAlert, fetchAlerts, fetchAlertsSummary, type Alert, type AlertSummary } from '@/lib/api';
 
 export default function AlertsPage() {
   const [alerts, setAlerts] = useState<Alert[]>([]);
-  const [summary, setSummary] = useState<Summary | null>(null);
+  const [summary, setSummary] = useState<AlertSummary | null>(null);
   const [loading, setLoading] = useState(true);
 
   const fetchData = async () => {
     try {
-      const [alertsRes, summaryRes] = await Promise.all([
-        fetch('http://127.0.0.1:8000/api/alerts/'),
-        fetch('http://127.0.0.1:8000/api/alerts/summary')
+      const [alertsData, summaryData] = await Promise.all([
+        fetchAlerts(),
+        fetchAlertsSummary(),
       ]);
-      setAlerts(await alertsRes.json());
-      setSummary(await summaryRes.json());
+      setAlerts(alertsData);
+      setSummary(summaryData);
     } catch (err) {
       console.error("Failed to fetch alerts", err);
     } finally {
@@ -62,10 +41,9 @@ export default function AlertsPage() {
     return () => clearInterval(interval);
   }, []);
 
-  const acknowledgeAlert = async (city: string) => {
+  const handleAcknowledge = async (city: string) => {
     try {
-      await fetch(`http://127.0.0.1:8000/api/alerts/acknowledge/${city}`, { method: 'POST' });
-      // Update local state for immediate feedback
+      await acknowledgeAlert(city);
       setAlerts(prev => prev.map(a => a.city === city ? { ...a, acknowledged: true } : a));
     } catch (err) {
       console.error("Failed to acknowledge alert", err);
@@ -187,7 +165,7 @@ export default function AlertsPage() {
 
                 {!alert.acknowledged ? (
                   <button 
-                    onClick={() => acknowledgeAlert(alert.city)}
+                    onClick={() => handleAcknowledge(alert.city)}
                     className="p-3 bg-teal-500/10 hover:bg-teal-500 text-teal-400 hover:text-white rounded-xl border border-teal-500/30 transition-all shadow-lg hover:shadow-teal-500/20 group/btn"
                   >
                     <Check className="w-5 h-5 group-hover/btn:scale-110 transition-transform" />

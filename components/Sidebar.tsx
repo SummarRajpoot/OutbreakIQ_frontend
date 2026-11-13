@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { signOut } from "next-auth/react";
 import { cn } from '@/lib/utils';
+import { fetchAlertsSummary } from '@/lib/api';
 import { useState, useEffect } from 'react';
 
 const navItems = [
@@ -35,8 +36,7 @@ export default function Sidebar() {
   useEffect(() => {
     const checkAlerts = async () => {
       try {
-        const res = await fetch('http://127.0.0.1:8000/api/alerts/summary');
-        const data = await res.json();
+        const data = await fetchAlertsSummary();
         setHasCritical(data.counts.critical > 0);
       } catch (err) {
         console.error("Sidebar alerts check failed", err);
