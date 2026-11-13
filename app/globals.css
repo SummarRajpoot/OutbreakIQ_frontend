@@ -1,5 +1,51 @@
 @import "tailwindcss";
 
+@theme {
+  --color-episphere-navy: #0B132B;
+  --color-episphere-slate: #0F172A;
+  --color-episphere-teal: #0D9488;
+  --color-episphere-cyan: #0EA5E9;
+  --color-episphere-bg: #F8FAFC;
+  --color-episphere-surface: #FFFFFF;
+  --color-episphere-border: #E2E8F0;
+  --color-episphere-text-primary: #0F172A;
+  --color-episphere-text-secondary: #64748B;
+  --color-episphere-critical: #E11D48;
+  --color-episphere-warning: #D97706;
+  --color-episphere-normal: #059669;
+}
+
+:root {
+  /* Brand Palette */
+  --episphere-navy: #0B132B;
+  --episphere-slate-navy: #0F172A;
+  --episphere-teal: #0D9488;
+  --episphere-cyan: #0EA5E9;
+
+  /* Workspace Foundations */
+  --episphere-bg: #F8FAFC;
+  --episphere-surface: #FFFFFF;
+  --episphere-border: #E2E8F0;
+  --episphere-text-primary: #0F172A;
+  --episphere-text-secondary: #64748B;
+
+  /* Clinical & Epidemiological Severity Status */
+  --episphere-critical: #E11D48;
+  --episphere-warning: #D97706;
+  --episphere-normal: #059669;
+  --episphere-critical-bg: #FFF1F2;
+  --episphere-warning-bg: #FFFBEB;
+  --episphere-normal-bg: #ECFDF5;
+  --episphere-critical-border: #FECDD3;
+  --episphere-warning-border: #FDE68A;
+  --episphere-normal-border: #A7F3D0;
+
+  /* Accessible Focus & Elevation */
+  --episphere-ring: #0EA5E9;
+  --episphere-shadow-subtle: 0 1px 3px 0 rgb(0 0 0 / 0.04), 0 1px 2px -1px rgb(0 0 0 / 0.04);
+  --episphere-shadow-card: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+}
+
 @layer base {
   *, *::before, *::after {
     box-sizing: border-box;
@@ -7,9 +53,84 @@
   body {
     margin: 0;
     padding: 0;
+    background-color: var(--episphere-bg, #F8FAFC);
+    color: var(--episphere-text-primary, #0F172A);
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Accessible interactive focus-visible standard */
+  :focus-visible {
+    outline: 2px solid var(--episphere-ring, #0EA5E9);
+    outline-offset: 2px;
   }
 }
 
+/* Custom Ergonomic Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94A3B8;
+}
+
+/* Reusable EpiSphere Component Foundations */
+.episphere-card {
+  background-color: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.04), 0 1px 2px -1px rgb(0 0 0 / 0.04);
+}
+
+.episphere-badge-critical {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.625rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 9999px;
+  background-color: #FFF1F2;
+  color: #E11D48;
+  border: 1px solid #FECDD3;
+}
+
+.episphere-badge-warning {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.625rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 9999px;
+  background-color: #FFFBEB;
+  color: #D97706;
+  border: 1px solid #FDE68A;
+}
+
+.episphere-badge-normal {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.625rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 9999px;
+  background-color: #ECFDF5;
+  color: #059669;
+  border: 1px solid #A7F3D0;
+}
+
+/* Preserved Legacy Utility Classes */
 .hero-heading {
   font-feature-settings: "ss01";
 }
